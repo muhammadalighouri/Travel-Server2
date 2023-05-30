@@ -1,0 +1,94 @@
+[
+  {
+    "_id": "647221d478697fd2e26316b7",
+    "name": "Hyundai Elentra",
+    "description": "This is a test car.",
+    "category": "Sedan",
+    "type": "Intemediate Sedan",
+    "mainImages": [
+      "https://res.cloudinary.com/dpob3blch/image/upload/v1685202362/Rectangle_23_potfyb.png"
+    ],
+    "image": "https://res.cloudinary.com/dpob3blch/image/upload/v1685200884/Car_Photo1.773f912ef9ea501c2eb3_ynkqt8.png",
+    "brand": "Hyundai",
+    "engine": "M",
+    "maxPeople": 5,
+    "numDoors": 4,
+    "bags": 2,
+    "pricePerDay": 100,
+    "pricePerHour": 10,
+    "availability": true,
+    "discount": 5,
+    "year": 2023,
+    "reviews": [],
+    "__v": 0
+  },
+  {
+    "_id": "6472222a78697fd2e26316b9",
+    "name": "Hyundai Sonata",
+    "description": "This is a test car.",
+    "category": "Sedan",
+    "type": "Intemediate Sedan",
+    "mainImages": [
+      "https://res.cloudinary.com/dpob3blch/image/upload/v1685202362/Rectangle_23_potfyb.png"
+    ],
+    "image": "https://res.cloudinary.com/dpob3blch/image/upload/v1685200884/Car_Photo1.773f912ef9ea501c2eb3_ynkqt8.png",
+    "brand": "Hyundai",
+    "engine": "M",
+    "maxPeople": 5,
+    "numDoors": 4,
+    "bags": 2,
+    "pricePerDay": 300,
+    "pricePerHour": 30,
+    "availability": true,
+    "discount": 15,
+    "year": 2022,
+    "reviews": [],
+    "__v": 0
+  },
+  {
+    "_id": "6472236978697fd2e26316bd",
+    "name": "Lexus ES250",
+    "description": "This is a test car.",
+    "category": "Luxury",
+    "type": "Premium VIP",
+    "mainImages": [
+      "https://res.cloudinary.com/dpob3blch/image/upload/v1685202362/Rectangle_23_potfyb.png"
+    ],
+    "image": "https://res.cloudinary.com/dpob3blch/image/upload/v1685200884/Car_Photo1.773f912ef9ea501c2eb3_ynkqt8.png",
+    "brand": "Lexus",
+    "engine": "L",
+    "maxPeople": 5,
+    "numDoors": 4,
+    "bags": 5,
+    "pricePerDay": 1500,
+    "pricePerHour": 130,
+    "availability": true,
+    "discount": 15,
+    "year": 2023,
+    "reviews": [],
+    "__v": 0
+  },
+  {
+    "_id": "647222ba78697fd2e26316bb",
+    "name": "Nessan Patrol",
+    "description": "This is a test car.",
+    "category": "SUV",
+    "type": "Premium VIP",
+    "mainImages": [
+      "https://res.cloudinary.com/dpob3blch/image/upload/v1685202362/Rectangle_23_potfyb.png"
+    ],
+    "image": "https://res.cloudinary.com/dpob3blch/image/upload/v1685200884/Car_Photo1.773f912ef9ea501c2eb3_ynkqt8.png",
+    "brand": "Nessan",
+    "engine": "L",
+    "maxPeople": 7,
+    "numDoors": 4,
+    "bags": 5,
+    "pricePerDay": 1300,
+    "pricePerHour": 100,
+    "availability": true,
+    "discount": 10,
+    "year": 2022,
+    "reviews": [],
+    "__v": 0
+  }
+]
