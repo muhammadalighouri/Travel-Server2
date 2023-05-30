@@ -1,7 +1,7 @@
 {
-  "name": "Travel Server",
+  "name": "travel-server",
   "version": "1.0.0",
-  "description": "Full Stack ASE Ecommerce",
+  "description": "A server for a travel application",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
