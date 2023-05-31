@@ -16,13 +16,7 @@ const {
 } = require("../controllers/userController");
 const { isAuthenticatedUser, authorizeRoles } = require("../middlewares/auth");
 const { isVendor } = require("../middlewares/isVendor");
-const {
-    registerVendor,
-    loginVendor,
-    getVendorDetails,
-    updateVendorProfile,
-    updateVendorPassword,
-} = require("../controllers/vendorControllers");
+
 
 const router = express.Router();
 
@@ -30,7 +24,7 @@ router.route("/register").post(registerUser);
 router.route("/login").post(loginUser);
 router.route("/logout").get(logoutUser);
 
-router.route("/confirm_email/:token").post(confirmEmail);
+router.route("/confirm_email/:token").get(confirmEmail);
 router.route("/me").post(getUserDetails);
 
 router.route("/password/forgot").post(forgotPassword);
@@ -52,16 +46,8 @@ router
 
 // vender routes
 
-router.route("/register").post(registerVendor);
-router.route("/login").post(loginVendor);
 
-router
-    .route("/profile")
-    .get(isAuthenticatedUser, isVendor, getVendorDetails)
-    .put(isAuthenticatedUser, isVendor, updateVendorProfile);
 
-router
-    .route("/password/update")
-    .put(isAuthenticatedUser, isVendor, updateVendorPassword);
+
 
 module.exports = router;

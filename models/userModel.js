@@ -52,7 +52,7 @@ const userSchema = new mongoose.Schema({
     passport: {
         type: Number,
     },
-
+    favorites: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Car' }],
     password: {
         type: String,
         required: [true, "Please Enter Your Password"],

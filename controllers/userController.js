@@ -1,5 +1,4 @@
 const User = require("../models/userModel");
-const Vendor = require("../models/vendorModel");
 const asyncErrorHandler = require("../middlewares/asyncErrorHandler");
 const sendToken = require("../utils/sendToken");
 const ErrorHandler = require("../utils/errorHandler");
@@ -42,7 +41,6 @@ exports.registerUser = asyncErrorHandler(async (req, res, next) => {
         return next(new ErrorHandler(error.message, 500));
     }
 });
-// Confirm Email
 exports.confirmEmail = asyncErrorHandler(async (req, res, next) => {
     try {
         // Get token from URL
@@ -55,7 +53,7 @@ exports.confirmEmail = asyncErrorHandler(async (req, res, next) => {
             .digest("hex");
 
         const user = await User.findOne({
-            confirmationToken: hashToken,
+            confirmEmailToken: hashToken, // Changed from 'confirmationToken'
         });
 
         // If no user or the token has expired, send an error
@@ -65,7 +63,7 @@ exports.confirmEmail = asyncErrorHandler(async (req, res, next) => {
 
         // If the user exists and the token is valid, confirm the email and remove the token
         user.emailVerified = true;
-        user.confirmationToken = undefined;
+        user.confirmEmailToken = undefined; // Changed from 'confirmationToken'
 
         await user.save({ validateBeforeSave: false });
 
@@ -77,6 +75,7 @@ exports.confirmEmail = asyncErrorHandler(async (req, res, next) => {
         return next(new ErrorHandler(error.message, 500));
     }
 });
+
 // After registration, send a phone verification code
 exports.sendPhoneVerificationCode = asyncErrorHandler(
     async (req, res, next) => {
@@ -162,19 +161,12 @@ exports.loginUser = asyncErrorHandler(async (req, res, next) => {
     // Generate JWT token first
     const token = user.getJWTToken();
 
-    // Find vendor details for the user
-    const vendor = await Vendor.findOne({ user: user._id });
+
 
     // Convert user to JSON object
     const userObj = user.toObject();
 
-    if (!vendor) {
-        // If user is not a vendor, add a vendor property to userObj and set it to false
-        userObj.vendor = false;
-    } else {
-        // If user is a vendor, add a vendor property to userObj and set it to vendor details
-        userObj.vendor = vendor;
-    }
+
 
     // Send token and userObj
     res.status(201).json({
@@ -204,19 +196,10 @@ exports.getUserDetails = asyncErrorHandler(async (req, res, next) => {
     // Generate JWT token first
     const token = user.getJWTToken();
 
-    // Find vendor details for the user
-    const vendor = await Vendor.findOne({ user: req.body.user });
 
     // Convert user to JSON object
     const userObj = user.toObject();
 
-    if (!vendor) {
-        // If user is not a vendor, add a vendor property to userObj and set it to false
-        userObj.vendor = false;
-    } else {
-        // If user is a vendor, add a vendor property to userObj and set it to vendor details
-        userObj.vendor = vendor;
-    }
 
     // Send token and userObj
     res.status(201).json({

@@ -20,20 +20,20 @@ app.use(fileUpload());
 app.use(cors.corsAll);
 
 const user = require("./routes/userRoute");
-const product = require("./routes/productRoute");
-const order = require("./routes/orderRoute");
-const payment = require("./routes/paymentRoute");
+const booking = require("./routes/bookingRoute");
+
+
 const category = require("./routes/categoryRoute");
-const vendor = require("./routes/vendorRoutes");
+const favorites = require('./routes/favoriteRoutes');
 const car = require("./routes/carRoute");
 
 app.use("/api/v1/user", user);
 app.use("/api/v1/cars", car);
-app.use("/api/v1", product);
-app.use("/api/v1", order);
-app.use("/api/v1", payment);
+app.use('/api/v1/favorites', favorites);
+app.use("/api/v1/booking", booking);
+
 app.use("/api/v1", category);
-app.use("/api/v1/vendor", vendor);
+
 
 // deployment
 __dirname = path.resolve();
