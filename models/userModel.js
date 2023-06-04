@@ -42,7 +42,9 @@ const userSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
-
+    phoneVerificationId: {
+        type: String,
+    },
     drivingLicense: {
         type: Number,
     },

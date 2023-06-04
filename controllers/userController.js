@@ -5,7 +5,7 @@ const ErrorHandler = require("../utils/errorHandler");
 const sendEmail = require("../utils/sendEmail");
 const crypto = require("crypto");
 const cloudinary = require("cloudinary");
-
+const { sendOtp, verifyOtp } = require('../utils/msegatService');
 // Register User
 exports.registerUser = asyncErrorHandler(async (req, res, next) => {
     const { firstName, middleName, lastName, email, password, phone } = req.body;
@@ -76,36 +76,29 @@ exports.confirmEmail = asyncErrorHandler(async (req, res, next) => {
     }
 });
 
-// After registration, send a phone verification code
-exports.sendPhoneVerificationCode = asyncErrorHandler(
-    async (req, res, next) => {
-        const { phone } = req.body;
+// Send OTP
+exports.sendPhoneVerification = asyncErrorHandler(async (req, res, next) => {
+    const { phone } = req.body;
 
-        const user = await User.findOne({ phone });
+    const user = await User.findOne({ phone });
 
-        if (!user) {
-            return next(new ErrorHandler("User Not Found", 404));
-        }
-
-        // Generate a random 6 digit code
-        const verificationCode = Math.floor(100000 + Math.random() * 900000);
-
-        // Hash the verification code and store in the database
-        user.phoneVerificationHash = crypto
-            .createHash("sha256")
-            .update(verificationCode.toString())
-            .digest("hex");
-        await user.save({ validateBeforeSave: false });
-
-        // Use msgat API to send the code to the user's phone number
-        // (Remember to handle errors and edge cases appropriately)
-
-        res.status(200).json({
-            success: true,
-            message: `Verification code sent to ${phone} successfully`,
-        });
+    if (!user) {
+        return next(new ErrorHandler("User Not Found", 404));
     }
-);
+
+    // Send OTP using Msegat API
+    const response = await sendOtp(phone);
+
+    // Store OTP id in the database for verification
+    user.phoneVerificationId = response.id;
+    await user.save({ validateBeforeSave: false });
+
+    res.status(200).json({
+        success: true,
+        message: "OTP has been sent",
+        data: response
+    });
+});
 
 // Verify the phone verification code
 exports.verifyPhone = asyncErrorHandler(async (req, res, next) => {
@@ -117,19 +110,16 @@ exports.verifyPhone = asyncErrorHandler(async (req, res, next) => {
         return next(new ErrorHandler("User Not Found", 404));
     }
 
-    // Hash the provided verification code and compare with the one in the database
-    const providedHash = crypto
-        .createHash("sha256")
-        .update(verificationCode.toString())
-        .digest("hex");
+    // Verify OTP using Msegat API
+    const response = await verifyOtp(verificationCode, user.phoneVerificationId);
 
-    if (providedHash !== user.phoneVerificationHash) {
+    if (response.code !== 1) {
         return next(new ErrorHandler("Invalid verification code", 400));
     }
 
-    // If valid, set phoneVerified to true and remove the phoneVerificationHash
+    // If valid, set phoneVerified to true and remove the phoneVerificationId
     user.phoneVerified = true;
-    user.phoneVerificationHash = undefined;
+    user.phoneVerificationId = undefined;
 
     await user.save({ validateBeforeSave: false });
 
@@ -138,6 +128,8 @@ exports.verifyPhone = asyncErrorHandler(async (req, res, next) => {
         message: "Phone number verified successfully",
     });
 });
+
+
 
 exports.loginUser = asyncErrorHandler(async (req, res, next) => {
     const { email, password } = req.body;
@@ -251,7 +243,7 @@ exports.resetPassword = asyncErrorHandler(async (req, res, next) => {
     // create hash token
     const resetPasswordToken = crypto
         .createHash("sha256")
-        .update(req.params.token)
+        .update(req.body.token)
         .digest("hex");
 
     const user = await User.findOne({
@@ -273,7 +265,7 @@ exports.resetPassword = asyncErrorHandler(async (req, res, next) => {
 
 // Update Password
 exports.updatePassword = asyncErrorHandler(async (req, res, next) => {
-    const user = await User.findById(req.user.id).select("+password");
+    const user = await User.findById(req.body.user).select("+password");
 
     const isPasswordMatched = await user.comparePassword(req.body.oldPassword);
 
@@ -297,16 +289,19 @@ exports.updateProfile = asyncErrorHandler(async (req, res, next) => {
         passport: req.body.passport,
     };
 
-    // Upload new avatar image
-    const myCloud = await cloudinary.v2.uploader.upload(req.body.avatar, {
-        folder: "avatars",
-        width: 150,
-        crop: "scale",
-    });
-    newUserData.avatar = {
-        public_id: myCloud.public_id,
-        url: myCloud.secure_url,
-    };
+    if (req.body.avatar) {
+        // Upload new avatar image
+        const myCloud = await cloudinary.v2.uploader.upload(req.body.avatar, {
+            folder: "avatars",
+            width: 150,
+            crop: "scale",
+        });
+        newUserData.avatar = {
+            public_id: myCloud.public_id,
+            url: myCloud.secure_url,
+        };
+
+    }
 
     const updatedUser = await User.findByIdAndUpdate(req.user, newUserData, {
         new: true,

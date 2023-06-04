@@ -1,10 +1,11 @@
 const cartModels = require("../models/carModel");
+const User = require("../models/userModel");
 
 // Filter cars based on multiple criteria
 const filterCars = async (req, res) => {
     try {
         const filter = {};
-        const limit = 10;  // Set default limit to 10
+        const limit = 10; // Set default limit to 10
         const page = parseInt(req.query.page) || 1;
 
         // Apply filters based on request query parameters
@@ -53,70 +54,80 @@ const filterCars = async (req, res) => {
             .skip((page - 1) * limit)
             .limit(limit);
 
-        const total = await cartModels.Car.countDocuments(filter);  // Total count of filtered cars
+        const total = await cartModels.Car.countDocuments(filter); // Total count of filtered cars
         console.log(cars);
 
         // Return cars along with pagination info
         res.json({ cars });
     } catch (error) {
-        console.log(error);  // log the error to your server console.
-        res.status(500).json({ error: error.message });  // Send the actual error message as the response.
+        console.log(error); // log the error to your server console.
+        res.status(500).json({ error: error.message }); // Send the actual error message as the response.
     }
 };
 const filterInfo = async (req, res) => {
     try {
         // Categories with counts
         const categoryCounts = await cartModels.Car.aggregate([
-            { $group: { _id: "$category", count: { $sum: 1 } } }
+            { $group: { _id: "$category", count: { $sum: 1 } } },
         ]);
 
         // Brands with counts
         const brandCounts = await cartModels.Car.aggregate([
-            { $group: { _id: "$brand", count: { $sum: 1 } } }
+            { $group: { _id: "$brand", count: { $sum: 1 } } },
         ]);
 
         // Models (types) with counts
         const modelCounts = await cartModels.Car.aggregate([
-            { $group: { _id: "$type", count: { $sum: 1 } } }
+            { $group: { _id: "$type", count: { $sum: 1 } } },
         ]);
 
         // Price range
-        const minPrice = await cartModels.Car.find().sort({ pricePerDay: 1 }).limit(1).select('pricePerDay');
-        const maxPrice = await cartModels.Car.find().sort({ pricePerDay: -1 }).limit(1).select('pricePerDay');
+        const minPrice = await cartModels.Car.find()
+            .sort({ pricePerDay: 1 })
+            .limit(1)
+            .select("pricePerDay");
+        const maxPrice = await cartModels.Car.find()
+            .sort({ pricePerDay: -1 })
+            .limit(1)
+            .select("pricePerDay");
 
         // Number of available cars
-        const availableCarsCount = await cartModels.Car.countDocuments({ availability: true });
+        const availableCarsCount = await cartModels.Car.countDocuments({
+            availability: true,
+        });
 
         // Number of unavailable cars
-        const unavailableCarsCount = await cartModels.Car.countDocuments({ availability: false });
+        const unavailableCarsCount = await cartModels.Car.countDocuments({
+            availability: false,
+        });
 
         res.json({
             categories: {
                 name: "categories",
-                data: categoryCounts
+                data: categoryCounts,
             },
             brands: {
                 name: "brands",
-                data: brandCounts
+                data: brandCounts,
             },
             models: {
                 name: "models",
-                data: modelCounts
+                data: modelCounts,
             },
             priceRange: {
                 name: "priceRange",
                 data: {
                     min: minPrice[0]?.pricePerDay || 0,
                     max: maxPrice[0]?.pricePerDay || 0,
-                }
+                },
             },
             availabilityCount: {
                 name: "availabilityCount",
                 data: {
                     available: availableCarsCount,
-                    unavailable: unavailableCarsCount
-                }
-            }
+                    unavailable: unavailableCarsCount,
+                },
+            },
         });
     } catch (error) {
         res.status(500).send({
@@ -196,8 +207,8 @@ const createCar = async (req, res) => {
 // Get all cars
 const getAllCars = async (req, res) => {
     try {
-        const filter = {};
-        const limit = 10;  // Set default limit to 10
+        const filter = { availability: true }
+        const limit = 10; // Set default limit to 10
         const page = parseInt(req.query.page) || 1;
 
         // Apply filters based on request query parameters
@@ -206,8 +217,7 @@ const getAllCars = async (req, res) => {
         }
 
         if (req.query.carBrand) {
-
-            const brands = req.query.carBrand.split(',');
+            const brands = req.query.carBrand.split(",");
             filter.brand = { $in: brands };
         }
 
@@ -219,7 +229,7 @@ const getAllCars = async (req, res) => {
             filter.numDoors = parseInt(req.query.numDoors);
         }
         if (req.query.category) {
-            const categories = req.query.category.split(',');
+            const categories = req.query.category.split(",");
             filter.category = { $in: categories };
         }
 
@@ -244,21 +254,51 @@ const getAllCars = async (req, res) => {
         if (req.query.carYear) {
             filter.year = parseInt(req.query.carYear);
         }
+        const userId = req.body.user;
+        if (userId) {
+            // Fetch the user with populated favorites
+            const user = await User.findById(userId).populate("favorites");
+            // Check if user exists
+            if (!user) {
+                return res.status(404).json({ error: "User not found" });
+            }
 
-        const cars = await cartModels.Car.find(filter)
-            .skip((page - 1) * limit)
-            .limit(limit);
+            // If favorites query parameter is set to true, filter only favorite cars
+            if (req.query.favorites === "true") {
+                filter._id = { $in: user.favorites.map((favorite) => favorite._id) };
+            }
 
-        const total = await cartModels.Car.countDocuments(filter);  // Total count of filtered cars
+            const cars = await cartModels.Car.find(filter)
+                .skip((page - 1) * limit)
+                .limit(limit)
+                .lean(); // Use lean() to get plain JS objects instead of Mongoose documents.
 
-        // Return cars along with pagination info
-        res.json({ total, page, limit, cars });
+            // Add isFavorited field to each car
+            cars.forEach((car) => {
+                car.isFavorited = user.favorites.some(
+                    (favorite) => favorite._id.toString() === car._id.toString()
+                );
+            });
+
+            const total = await cartModels.Car.countDocuments(filter); // Total count of filtered cars
+
+            // Return cars along with pagination info
+            res.json({ total, page, limit, cars });
+        } else {
+            const cars = await cartModels.Car.find(filter)
+                .skip((page - 1) * limit)
+                .limit(limit);
+
+            const total = await cartModels.Car.countDocuments(filter); // Total count of filtered cars
+
+            // Return cars along with pagination info
+            res.json({ total, page, limit, cars });
+        }
     } catch (error) {
-        console.log(error);  // log the error to your server console.
-        res.status(500).json({ error: error.message });  // Send the actual error message as the response.
+        console.log(error); // log the error to your server console.
+        res.status(500).json({ error: error.message }); // Send the actual error message as the response.
     }
 };
-
 
 // Get a specific car by ID
 const getCarById = async (req, res) => {
@@ -468,5 +508,5 @@ module.exports = {
     filterCars,
     createReview,
     getAllReview,
-    filterInfo
+    filterInfo,
 };

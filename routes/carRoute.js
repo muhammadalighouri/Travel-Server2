@@ -5,7 +5,7 @@ const router = express.Router();
 
 router.post('/', carController.createCar);
 router.get('/filters', carController.filterInfo);
-router.get('/', carController.getAllCars);
+router.post('/all', carController.getAllCars);
 router.get('/:carId', carController.getCarById);
 router.put('/:carId', carController.updateCar);
 

@@ -21,6 +21,7 @@ const carSchema = new mongoose.Schema({
     maxPeople: { type: Number, required: true },
     numDoors: { type: Number, required: true },
     bags: { type: Number, required: true },
+    favoritedBy: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Car' }],
     pricePerDay: { type: Number, required: true },
     pricePerHour: { type: Number, required: true },
     availability: { type: Boolean, default: true },

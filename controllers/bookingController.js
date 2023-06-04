@@ -1,25 +1,48 @@
 const Booking = require('../models/bookingModel');
+const { Car } = require('../models/carModel');
 
 // Create a booking
 exports.createBooking = async (req, res) => {
     try {
         const booking = new Booking(req.body);
         await booking.save();
+
+        // Set availability of the car to false upon booking
+        const car = await Car.findById(req.body.car);
+        car.availability = false;
+        await car.save();
+
         res.status(201).send(booking);
     } catch (error) {
         res.status(400).send(error);
     }
 };
 
-// Get all bookings
+
+// Get all bookings of a user
 exports.getAllBookings = async (req, res) => {
     try {
-        const bookings = await Booking.find({}).populate('car').populate('user');
-        res.send(bookings);
+        const userId = req.params.userId;
+        const bookings = await Booking.find({ user: userId }).populate('car').populate('user');
+
+        const bookingsByStatus = {
+            upcoming: [],
+            ongoing: [],
+            completed: [],
+            cancelled: []
+        };
+
+        bookings.forEach(booking => {
+            bookingsByStatus[booking.rideStatus].push(booking);
+        });
+
+        res.send(bookingsByStatus);
     } catch (error) {
         res.status(500).send();
     }
 };
+
+
 
 // Get a single booking
 exports.getBooking = async (req, res) => {

@@ -13,9 +13,12 @@ const {
     updateUserRole,
     deleteUser,
     confirmEmail,
+    verifyPhone,
+    sendPhoneVerification,
 } = require("../controllers/userController");
 const { isAuthenticatedUser, authorizeRoles } = require("../middlewares/auth");
 const { isVendor } = require("../middlewares/isVendor");
+const { sendOtp } = require("../utils/msegatService");
 
 
 const router = express.Router();
@@ -30,8 +33,11 @@ router.route("/me").post(getUserDetails);
 router.route("/password/forgot").post(forgotPassword);
 router.route("/password/reset/:token").put(resetPassword);
 
-router.route("/password/update").put(isAuthenticatedUser, updatePassword);
+router.route("/password/update").put(updatePassword);
+router.post('/sendOtp', sendPhoneVerification);
 
+// Verify OTP code
+router.post('/verifyPhone', verifyPhone);
 router.route("/me/update").put(isAuthenticatedUser, updateProfile);
 
 router

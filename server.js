@@ -2,13 +2,16 @@ const app = require('./app');
 const connectDatabase = require('./config/database');
 const cloudinary = require('cloudinary');
 const PORT = process.env.PORT || 5000;
+const checkBookingEndDates = require('./utils/scheduledTasks');
+// const checkBookingEndDatesTwo = require('./utils/scheduledBooking');
 
 // UncaughtException Error
 process.on('uncaughtException', (err) => {
     console.log(`Error: ${err.message}`);
     process.exit(1);
 });
-
+checkBookingEndDates();
+// checkBookingEndDatesTwo();
 connectDatabase();
 
 cloudinary.config({
