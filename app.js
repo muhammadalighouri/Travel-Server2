@@ -21,19 +21,17 @@ app.use(cors.corsAll);
 
 const user = require("./routes/userRoute");
 const booking = require("./routes/bookingRoute");
-
-
+const address = require("./routes/addressRoute");
 const category = require("./routes/categoryRoute");
-const favorites = require('./routes/favoriteRoutes');
+const favorites = require("./routes/favoriteRoutes");
 const car = require("./routes/carRoute");
 
 app.use("/api/v1/user", user);
 app.use("/api/v1/cars", car);
-app.use('/api/v1/favorites', favorites);
+app.use("/api/v1/favorites", favorites);
 app.use("/api/v1/booking", booking);
-
+app.use("/api/v1/address", address);
 app.use("/api/v1", category);
-
 
 // deployment
 __dirname = path.resolve();

@@ -12,6 +12,10 @@ const bookingSchema = new mongoose.Schema(
             ref: "User",
             required: true,
         },
+        address: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Address",
+        },
         pickupLocation: {
             state: String,
             city: String,
