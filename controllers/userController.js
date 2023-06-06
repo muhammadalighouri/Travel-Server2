@@ -289,21 +289,21 @@ exports.updateProfile = asyncErrorHandler(async (req, res, next) => {
         passport: req.body.passport,
     };
 
-    if (req.body.avatar) {
-        // Upload new avatar image
-        const myCloud = await cloudinary.v2.uploader.upload(req.body.avatar, {
-            folder: "avatars",
-            width: 150,
-            crop: "scale",
-        });
-        newUserData.avatar = {
-            public_id: myCloud.public_id,
-            url: myCloud.secure_url,
-        };
 
-    }
+    // Upload new avatar image
+    const myCloud = await cloudinary.v2.uploader.upload(req.body.avatar, {
+        folder: "avatars",
+        width: 150,
+        crop: "scale",
+    });
+    newUserData.avatar = {
+        public_id: myCloud.public_id,
+        url: myCloud.secure_url,
+    };
 
-    const updatedUser = await User.findByIdAndUpdate(req.user, newUserData, {
+
+
+    const updatedUser = await User.findByIdAndUpdate(req.body.user, newUserData, {
         new: true,
         runValidators: true,
         useFindAndModify: false,

@@ -38,7 +38,7 @@ router.post('/sendOtp', sendPhoneVerification);
 
 // Verify OTP code
 router.post('/verifyPhone', verifyPhone);
-router.route("/me/update").put(isAuthenticatedUser, updateProfile);
+router.route("/me/update").put(updateProfile);
 
 router
     .route("/admin/users")
