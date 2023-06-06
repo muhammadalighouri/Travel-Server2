@@ -32,9 +32,9 @@ const bookingSchema = new mongoose.Schema(
             type: Date,
             required: true,
         },
-        rate: {
-            type: String,
-            enum: ["perDay", "perHour"],
+        delivery: {
+            type: Boolean,
+            default: false,
         },
         addons: [
             {

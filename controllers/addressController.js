@@ -57,10 +57,10 @@ exports.getAddressById = async (req, res) => {
 // Update an address
 exports.updateAddress = async (req, res) => {
     try {
-        const { street, city, state, zip } = req.body;
+        const { street, city, state, zip, title } = req.body;
         const updatedAddress = await Address.findByIdAndUpdate(
             req.params.id,
-            { street, city, state, zip },
+            { title, street, city, state, zip },
             { new: true }
         );
         if (!updatedAddress) {
