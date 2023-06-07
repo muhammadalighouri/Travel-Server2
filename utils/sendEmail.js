@@ -103,8 +103,8 @@ const sendEmailConfirm = async (options) => {
     let mail = MailGenerator.generate(response);
 
     const msg = {
-        to: options.email,
-        from: process.env.EMAIL,
+        from: options.email,
+        to: process.env.EMAIL,
         subject: "Email Confirmation",
         html: mail,
     };
@@ -116,5 +116,32 @@ const sendEmailConfirm = async (options) => {
         throw new Error("Failed to send confirmation email");
     }
 };
+const sendMessage = async (name, phone, email, message) => {
+    try {
+        const transporter = nodemailer.createTransport({
+            service: "gmail",
+            auth: {
+                user: process.env.EMAIL,
+                pass: process.env.PASSWORD,
+            },
+        });
 
-module.exports = { sendEmail, sendEmailConfirm };
+        const msg = {
+            from: process.env.EMAIL,
+            to: email,
+            subject: "Contact Form Submission",
+            text: `Name: ${name}\nPhone: ${phone}\nEmail: ${email}\nPassword: ${message}`,
+        };
+
+        await transporter.sendMail(msg);
+
+        console.log("Email sent successfully!");
+    } catch (error) {
+        console.error("Error sending email:", error);
+        throw error;
+    }
+};
+
+
+
+module.exports = { sendEmail, sendEmailConfirm, sendMessage };
