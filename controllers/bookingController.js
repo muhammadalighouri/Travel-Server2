@@ -26,8 +26,8 @@ exports.getAllBookings = async (req, res) => {
         const bookings = await Booking.find({ user: userId }).populate('car').populate('user');
 
         const bookingsByStatus = {
-            upcoming: [],
-            ongoing: [],
+            processing: [],
+            running: [],
             completed: [],
             cancelled: []
         };
@@ -38,7 +38,7 @@ exports.getAllBookings = async (req, res) => {
 
         res.send(bookingsByStatus);
     } catch (error) {
-        res.status(500).send();
+        res.status(500).send(error);
     }
 };
 
@@ -84,11 +84,14 @@ exports.updateBooking = async (req, res) => {
 exports.deleteBooking = async (req, res) => {
     try {
         const booking = await Booking.findByIdAndDelete(req.params.id);
+        const car = await Car.findById(booking.car)
+        car.availability = true;
+        await car.save();
         if (!booking) {
-            return res.status(404).send();
+            return res.status(404).send({ message: "booking not find" });
         }
         res.send(booking);
     } catch (error) {
-        res.status(500).send();
+        res.status(500).send({ message: "booking deleted!" });
     }
 };

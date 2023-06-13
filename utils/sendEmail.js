@@ -103,8 +103,8 @@ const sendEmailConfirm = async (options) => {
     let mail = MailGenerator.generate(response);
 
     const msg = {
-        from: options.email,
-        to: process.env.EMAIL,
+        to: options.email,
+        from: process.env.EMAIL,
         subject: "Email Confirmation",
         html: mail,
     };

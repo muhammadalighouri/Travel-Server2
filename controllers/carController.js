@@ -207,7 +207,7 @@ const createCar = async (req, res) => {
 // Get all cars
 const getAllCars = async (req, res) => {
     try {
-        const filter = { availability: true }
+        const filter = { availability: true };
         const limit = 10; // Set default limit to 10
         const page = parseInt(req.query.page) || 1;
 

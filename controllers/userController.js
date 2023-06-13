@@ -5,10 +5,10 @@ const ErrorHandler = require("../utils/errorHandler");
 const sendEmail = require("../utils/sendEmail");
 const crypto = require("crypto");
 const cloudinary = require("cloudinary");
-const { sendOtp, verifyOtp } = require('../utils/msegatService');
+const { sendOtp, verifyOtp } = require("../utils/msegatService");
 // Register User
 exports.registerUser = asyncErrorHandler(async (req, res, next) => {
-    const { firstName, middleName, lastName, email, password, phone } = req.body;
+    const { firstName, lastName, email, password, phone } = req.body;
 
     const user = await User.create({
         firstName,
@@ -23,21 +23,19 @@ exports.registerUser = asyncErrorHandler(async (req, res, next) => {
     await user.save({ validateBeforeSave: false });
 
     // Create confirmation URL
-    const confirmUrl = `${req.protocol}://localhost:3000/confirm_email/${confirmationToken}`;
+    const confirmUrl = `${req.protocol}://travelcotest.netlify.app/confirm_email/${confirmationToken}`;
 
     try {
         await sendEmail.sendEmailConfirm({
-            email: user.email,
+            email: email,
             data: {
                 confirm_url: confirmUrl,
             },
         });
-
         sendToken(user, 201, res);
     } catch (error) {
         user.confirmationToken = undefined;
         await user.save({ validateBeforeSave: false });
-
         return next(new ErrorHandler(error.message, 500));
     }
 });
@@ -53,7 +51,7 @@ exports.confirmEmail = asyncErrorHandler(async (req, res, next) => {
             .digest("hex");
 
         const user = await User.findOne({
-            confirmEmailToken: hashToken, // Changed from 'confirmationToken'
+            confirmEmailToken: hashToken,
         });
 
         // If no user or the token has expired, send an error
@@ -75,7 +73,40 @@ exports.confirmEmail = asyncErrorHandler(async (req, res, next) => {
         return next(new ErrorHandler(error.message, 500));
     }
 });
+exports.sendEmailConfirmation = asyncErrorHandler(async (req, res, next) => {
+    const { email } = req.body;
 
+    const user = await User.findOne({ email });
+
+    if (!user) {
+        return next(new ErrorHandler("User not found", 404));
+    }
+
+    // Create email confirmation token
+    const confirmationToken = user.getConfirmationToken();
+    await user.save({ validateBeforeSave: false });
+
+    // Create confirmation URL
+    const confirmUrl = `${req.protocol}://https://travelcotest.netlify.app/confirm_email/${confirmationToken}`;
+
+    try {
+        await sendEmail.sendEmailConfirm({
+            email: user.email,
+            data: {
+                confirm_url: confirmUrl,
+            },
+        });
+
+        res.status(200).json({
+            success: true,
+            message: 'Email confirmation sent'
+        });
+    } catch (error) {
+        user.confirmationToken = undefined;
+        await user.save({ validateBeforeSave: false });
+        return next(new ErrorHandler(error.message, 500));
+    }
+});
 // Send OTP
 exports.sendPhoneVerification = asyncErrorHandler(async (req, res, next) => {
     const { phone } = req.body;
@@ -96,7 +127,7 @@ exports.sendPhoneVerification = asyncErrorHandler(async (req, res, next) => {
     res.status(200).json({
         success: true,
         message: "OTP has been sent",
-        data: response
+        data: response,
     });
 });
 
@@ -129,8 +160,6 @@ exports.verifyPhone = asyncErrorHandler(async (req, res, next) => {
     });
 });
 
-
-
 exports.loginUser = asyncErrorHandler(async (req, res, next) => {
     const { email, password } = req.body;
 
@@ -153,12 +182,8 @@ exports.loginUser = asyncErrorHandler(async (req, res, next) => {
     // Generate JWT token first
     const token = user.getJWTToken();
 
-
-
     // Convert user to JSON object
     const userObj = user.toObject();
-
-
 
     // Send token and userObj
     res.status(201).json({
@@ -188,10 +213,8 @@ exports.getUserDetails = asyncErrorHandler(async (req, res, next) => {
     // Generate JWT token first
     const token = user.getJWTToken();
 
-
     // Convert user to JSON object
     const userObj = user.toObject();
-
 
     // Send token and userObj
     res.status(201).json({
@@ -200,6 +223,69 @@ exports.getUserDetails = asyncErrorHandler(async (req, res, next) => {
         user: userObj,
     });
 });
+
+
+// Update Password
+exports.updatePassword = asyncErrorHandler(async (req, res, next) => {
+    const user = await User.findById(req.body.user).select("+password");
+
+    const isPasswordMatched = await user.comparePassword(req.body.oldPassword);
+
+    if (!isPasswordMatched) {
+        return next(new ErrorHandler("Old Password is Invalid", 400));
+    }
+
+    user.password = req.body.newPassword;
+    await user.save();
+    sendToken(user, 201, res);
+});
+
+// Update User Profile
+exports.updateProfile = asyncErrorHandler(async (req, res, next) => {
+    const newUserData = {
+        firstName: req.body.firstName,
+        lastName: req.body.lastName,
+        email: req.body.email,
+        drivingLicense: req.body.drivingLicense,
+        nationalId: req.body.nationalId,
+        passport: req.body.passport,
+    };
+
+    // Upload new avatar image
+    const myCloud = await cloudinary.v2.uploader.upload(req.body.avatar, {
+        folder: "avatars",
+        width: 150,
+        crop: "scale",
+    });
+    newUserData.avatar = {
+        public_id: myCloud.public_id,
+        url: myCloud.secure_url,
+    };
+
+    const updatedUser = await User.findByIdAndUpdate(req.body.user, newUserData, {
+        new: true,
+        runValidators: true,
+        useFindAndModify: false,
+    });
+
+    res.status(200).json({
+        success: true,
+        user: updatedUser,
+    });
+});
+
+
+
+
+
+
+
+
+
+
+
+///////////
+
 
 // Forgot Password
 exports.forgotPassword = asyncErrorHandler(async (req, res, next) => {
@@ -263,57 +349,8 @@ exports.resetPassword = asyncErrorHandler(async (req, res, next) => {
     sendToken(user, 200, res);
 });
 
-// Update Password
-exports.updatePassword = asyncErrorHandler(async (req, res, next) => {
-    const user = await User.findById(req.body.user).select("+password");
-
-    const isPasswordMatched = await user.comparePassword(req.body.oldPassword);
-
-    if (!isPasswordMatched) {
-        return next(new ErrorHandler("Old Password is Invalid", 400));
-    }
-
-    user.password = req.body.newPassword;
-    await user.save();
-    sendToken(user, 201, res);
-});
-
-// Update User Profile
-exports.updateProfile = asyncErrorHandler(async (req, res, next) => {
-    const newUserData = {
-        firstName: req.body.firstName,
-        lastName: req.body.lastName,
-        email: req.body.email,
-        drivingLicense: req.body.drivingLicense,
-        nationalId: req.body.nationalId,
-        passport: req.body.passport,
-    };
 
 
-    // Upload new avatar image
-    const myCloud = await cloudinary.v2.uploader.upload(req.body.avatar, {
-        folder: "avatars",
-        width: 150,
-        crop: "scale",
-    });
-    newUserData.avatar = {
-        public_id: myCloud.public_id,
-        url: myCloud.secure_url,
-    };
-
-
-
-    const updatedUser = await User.findByIdAndUpdate(req.body.user, newUserData, {
-        new: true,
-        runValidators: true,
-        useFindAndModify: false,
-    });
-
-    res.status(200).json({
-        success: true,
-        user: updatedUser,
-    });
-});
 
 // ADMIN DASHBOARD
 

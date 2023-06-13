@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const cron = require("node-cron");
+
 const bookingSchema = new mongoose.Schema(
     {
         car: {
@@ -46,15 +46,15 @@ const bookingSchema = new mongoose.Schema(
             type: Number,
             required: true,
         },
-        paymentStatus: {
-            type: String,
-            enum: ["pending", "completed", "cancelled", "refunded"],
-            default: "pending",
+        isContract: {
+            type: Boolean,
+            default: false,
         },
+
         rideStatus: {
             type: String,
-            enum: ["upcoming", "ongoing", "completed", "cancelled"],
-            default: "upcoming",
+            enum: ["processing", "running", "completed", "cancelled"],
+            default: "processing",
         },
     },
     {

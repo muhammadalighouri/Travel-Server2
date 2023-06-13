@@ -1,9 +1,10 @@
 const express = require('express');
 const carController = require('../controllers/carController');
+const { authorizeRoles } = require('../middlewares/auth');
 
 const router = express.Router();
 
-router.post('/', carController.createCar);
+router.post('/', authorizeRoles('admin'), carController.createCar);
 router.get('/filters', carController.filterInfo);
 router.post('/all', carController.getAllCars);
 router.get('/:carId', carController.getCarById);
