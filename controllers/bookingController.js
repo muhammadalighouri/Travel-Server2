@@ -1,5 +1,5 @@
-const Booking = require('../models/bookingModel');
-const { Car } = require('../models/carModel');
+const Booking = require("../models/bookingModel");
+const { Car } = require("../models/carModel");
 
 // Create a booking
 exports.createBooking = async (req, res) => {
@@ -18,21 +18,22 @@ exports.createBooking = async (req, res) => {
     }
 };
 
-
 // Get all bookings of a user
 exports.getAllBookings = async (req, res) => {
     try {
         const userId = req.params.userId;
-        const bookings = await Booking.find({ user: userId }).populate('car').populate('user');
+        const bookings = await Booking.find({ user: userId })
+            .populate("car")
+            .populate("user");
 
         const bookingsByStatus = {
             processing: [],
             running: [],
             completed: [],
-            cancelled: []
+            cancelled: [],
         };
 
-        bookings.forEach(booking => {
+        bookings.forEach((booking) => {
             bookingsByStatus[booking.rideStatus].push(booking);
         });
 
@@ -42,12 +43,12 @@ exports.getAllBookings = async (req, res) => {
     }
 };
 
-
-
 // Get a single booking
 exports.getBooking = async (req, res) => {
     try {
-        const booking = await Booking.findById(req.params.id).populate('car').populate('user');
+        const booking = await Booking.findById(req.params.id)
+            .populate("car")
+            .populate("user");
         if (!booking) {
             return res.status(404).send();
         }
@@ -60,11 +61,21 @@ exports.getBooking = async (req, res) => {
 // Update a booking
 exports.updateBooking = async (req, res) => {
     const updates = Object.keys(req.body);
-    const allowedUpdates = ['pickupLocation', 'returnLocation', 'startDate', 'endDate', 'addons', 'totalPrice', 'paymentStatus'];
-    const isValidOperation = updates.every((update) => allowedUpdates.includes(update));
+    const allowedUpdates = [
+        "pickupLocation",
+        "returnLocation",
+        "startDate",
+        "endDate",
+        "addons",
+        "totalPrice",
+        "paymentStatus",
+    ];
+    const isValidOperation = updates.every((update) =>
+        allowedUpdates.includes(update)
+    );
 
     if (!isValidOperation) {
-        return res.status(400).send({ error: 'Invalid updates!' });
+        return res.status(400).send({ error: "Invalid updates!" });
     }
 
     try {
@@ -72,7 +83,7 @@ exports.updateBooking = async (req, res) => {
         if (!booking) {
             return res.status(404).send();
         }
-        updates.forEach((update) => booking[update] = req.body[update]);
+        updates.forEach((update) => (booking[update] = req.body[update]));
         await booking.save();
         res.send(booking);
     } catch (error) {
@@ -84,7 +95,7 @@ exports.updateBooking = async (req, res) => {
 exports.deleteBooking = async (req, res) => {
     try {
         const booking = await Booking.findByIdAndDelete(req.params.id);
-        const car = await Car.findById(booking.car)
+        const car = await Car.findById(booking.car);
         car.availability = true;
         await car.save();
         if (!booking) {
@@ -93,5 +104,17 @@ exports.deleteBooking = async (req, res) => {
         res.send(booking);
     } catch (error) {
         res.status(500).send({ message: "booking deleted!" });
+    }
+};
+// admin controller
+
+// Get all bookings for admin
+exports.getAllBookingsByAdmin = async (req, res) => {
+    try {
+        const bookings = await Booking.find({}).populate("car").populate("user");
+
+        res.send(bookings);
+    } catch (error) {
+        res.status(500).send(error);
     }
 };

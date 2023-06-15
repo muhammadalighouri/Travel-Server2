@@ -1,29 +1,23 @@
-const express = require('express');
-const carController = require('../controllers/carController');
-const { authorizeRoles } = require('../middlewares/auth');
+const express = require("express");
+const carController = require("../controllers/carController");
+const { authorizeRoles } = require("../middlewares/auth");
 
 const router = express.Router();
 
-router.post('/', authorizeRoles('admin'), carController.createCar);
-router.get('/filters', carController.filterInfo);
-router.post('/all', carController.getAllCars);
-router.get('/:carId', carController.getCarById);
-router.put('/:carId', carController.updateCar);
+router.get("/filters", carController.filterInfo);
+router.post("/all", carController.getAllCars);
 
-router.delete('/:carId', carController.deleteCar);
-router.get('/available', carController.getAvailableCars);
-router.get('/type/:carType', carController.getCarsByType);
-router.get('/brand/:carBrand', carController.getCarsByBrand);
-router.get('/capacity/:maxPeople', carController.getCarsByMaxCapacity);
-router.get('/doors/:numDoors', carController.getCarsByNumDoors);
-router.get('/price', carController.getCarsByPriceRange);
-router.get('/discounted', carController.getDiscountedCars);
-router.get('/year/:carYear', carController.getCarsByYear);
-router.get('/:carId/availability', carController.checkCarAvailability);
-router.put('/:carId/availability', carController.updateCarAvailability);
-router.put('/:carId/discount', carController.applyDiscountToCar);
-router.put('/:carId/discount', carController.applyDiscountToCar);
-router.post('/:carId/reviews', carController.createReview);
-router.get('/:carId/reviews', carController.getAllReview);
-
+router.post("/:carId/reviews", carController.createReview);
+// admin routes
+router.post("/", authorizeRoles("admin"), carController.createCar);
+router.post("/all/admin", authorizeRoles("admin"), carController.getAllCarsAdmin);
+router.get(
+    "/:carId/reviews",
+    authorizeRoles("admin"),
+    carController.getAllReview
+);
+router.put("/:carId", authorizeRoles("admin"), carController.updateCar);
+router.post("/:carId/car", authorizeRoles("admin"), carController.getCarById);
+router.post("/:carId", authorizeRoles("admin"), carController.deleteCar);
+router.get("/available", carController.getAvailableCars);
 module.exports = router;

@@ -17,12 +17,10 @@ const bookingSchema = new mongoose.Schema(
             ref: "Address",
         },
         pickupLocation: {
-            state: String,
-            city: String,
+            type: String,
         },
         returnLocation: {
-            state: String,
-            city: String,
+            type: String,
         },
         startDate: {
             type: Date,
