@@ -231,6 +231,7 @@ const createCar = async (req, res) => {
             bags: req.body.bags,
             pricePerDay: req.body.pricePerDay,
             pricePerHour: req.body.pricePerHour,
+            pricePerMonth: req.body.pricePerMonth,
             discount: req.body.discount,
             year: req.body.year,
         };
@@ -280,6 +281,7 @@ const updateCar = async (req, res) => {
             bags: req.body.bags,
             pricePerDay: req.body.pricePerDay,
             pricePerHour: req.body.pricePerHour,
+            pricePerMonth: req.body.pricePerMonth,
             discount: req.body.discount,
             year: req.body.year,
         };
@@ -347,7 +349,7 @@ const getAvailableCars = async (req, res) => {
 // Update car availability
 const updateCarAvailability = async (req, res) => {
     try {
-        const car = await Car.findByIdAndUpdate(
+        const car = await cartModels.Car.findByIdAndUpdate(
             req.params.carId,
             { availability: req.body.availability },
             { new: true }

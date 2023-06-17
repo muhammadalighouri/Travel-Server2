@@ -31,6 +31,7 @@ exports.getAllBookings = async (req, res) => {
             running: [],
             completed: [],
             cancelled: [],
+            confirmed: [],
         };
 
         bookings.forEach((booking) => {
@@ -114,6 +115,62 @@ exports.getAllBookingsByAdmin = async (req, res) => {
         const bookings = await Booking.find({}).populate("car").populate("user");
 
         res.send(bookings);
+    } catch (error) {
+        res.status(500).send(error);
+    }
+};
+exports.acceptBooking = async (req, res) => {
+    try {
+        const booking = await Booking.findById(req.params.id);
+        if (!booking) {
+            return res.status(404).send({ message: "Booking not found" });
+        }
+        booking.isContract = true;
+        booking.rideStatus = "running";
+        await booking.save();
+        res.send(booking);
+    } catch (error) {
+        res.status(500).send(error);
+    }
+};
+exports.confirmBooking = async (req, res) => {
+    try {
+        const booking = await Booking.findById(req.params.id);
+        if (!booking) {
+            return res.status(404).send({ message: "Booking not found" });
+        }
+        booking.rideStatus = "confirmed";
+        await booking.save();
+        res.send(booking);
+    } catch (error) {
+        res.status(500).send(error);
+    }
+};
+
+exports.cancelBooking = async (req, res) => {
+    try {
+        const booking = await Booking.findById(req.params.id);
+        if (!booking) {
+            return res.status(404).send({ message: "Booking not found" });
+        }
+        booking.rideStatus = "cancelled"
+        booking.availability = true
+        await booking.save()
+        res.send(booking);
+    } catch (error) {
+        res.status(500).send(error);
+    }
+};
+exports.completeBooking = async (req, res) => {
+    try {
+        const booking = await Booking.findById(req.params.id);
+        if (!booking) {
+            return res.status(404).send({ message: "Booking not found" });
+        }
+        booking.rideStatus = "completed"
+        booking.availability = true
+        await booking.save()
+        res.send(booking);
     } catch (error) {
         res.status(500).send(error);
     }

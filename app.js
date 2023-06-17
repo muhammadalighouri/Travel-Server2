@@ -27,6 +27,8 @@ const address = require("./routes/addressRoute");
 const category = require("./routes/categoryRoute");
 const favorites = require("./routes/favoriteRoutes");
 const car = require("./routes/carRoute");
+const slide = require("./routes/slideRoute");
+const sponsor = require("./routes/sponserRoute");
 const contact = require("./routes/contactRoute");
 
 app.use("/api/v1/user", user);
@@ -35,6 +37,8 @@ app.use("/api/v1/favorites", favorites);
 app.use("/api/v1/booking", booking);
 app.use("/api/v1/address", address);
 app.use("/api/v1/contact", contact);
+app.use("/api/v1/slides", slide);
+app.use("/api/v1/sponsor", sponsor);
 app.use("/api/v1", category);
 
 // deployment

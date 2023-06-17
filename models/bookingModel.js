@@ -51,7 +51,7 @@ const bookingSchema = new mongoose.Schema(
 
         rideStatus: {
             type: String,
-            enum: ["processing", "running", "completed", "cancelled"],
+            enum: ["processing", 'confirmed', "running", "completed", "cancelled"],
             default: "processing",
         },
     },

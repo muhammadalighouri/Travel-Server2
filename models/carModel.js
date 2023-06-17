@@ -30,6 +30,7 @@ const carSchema = new mongoose.Schema({
     favoritedBy: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Car' }],
     pricePerDay: { type: Number, required: true },
     pricePerHour: { type: Number, required: true },
+    pricePerMonth: { type: Number, required: true },
     availability: { type: Boolean, default: true },
     discount: { type: Number, default: 0 },
     year: { type: Number, required: true },
