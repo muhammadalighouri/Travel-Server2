@@ -7,6 +7,7 @@ const addressSchema = new mongoose.Schema({
     state: String,
     zip: String,
     title: String,
+    latLong: String,
     user: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",

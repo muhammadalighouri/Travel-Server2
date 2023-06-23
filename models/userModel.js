@@ -4,7 +4,6 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
 
-
 const userSchema = new mongoose.Schema({
     firstName: {
         type: String,
@@ -14,6 +13,9 @@ const userSchema = new mongoose.Schema({
     lastName: {
         type: String,
         required: [true, "Please Enter Your Last Name"],
+    },
+    uid: {
+        type: String,
     },
     avatar: {
         public_id: {
@@ -31,16 +33,15 @@ const userSchema = new mongoose.Schema({
     },
     emailVerified: {
         type: Boolean,
-        default: false
+        default: false,
     },
-
     phone: {
         type: Number,
         required: [true, "Please Enter Your Phone Number"],
     },
     phoneVerified: {
         type: Boolean,
-        default: false
+        default: false,
     },
     phoneVerificationId: {
         type: String,
@@ -52,9 +53,16 @@ const userSchema = new mongoose.Schema({
         type: Number,
     },
     passport: {
-        type: Number,
+        country: {
+            type: String,
+
+        },
+        id: {
+            type: Number
+        }
     },
-    favorites: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Car' }],
+    favorites: [{ type: mongoose.Schema.Types.ObjectId, ref: "Car" }],
+    addresses: [{ type: mongoose.Schema.Types.ObjectId, ref: "Address" }],
     password: {
         type: String,
         required: [true, "Please Enter Your Password"],
@@ -65,23 +73,37 @@ const userSchema = new mongoose.Schema({
         type: Boolean,
         default: function () {
             return this.emailVerified && this.phoneVerified;
-        }
+        },
     },
     role: {
         type: String,
         default: "user",
     },
+    currency: {
+        type: String,
+    },
+    status: {
+        type: String,
+    },
+    statusNumber: {
+        type: String,
+    },
+    birthday: {
+        type: Date,
+    },
+    walletBalance: {
+        type: String,
+    },
     createdAt: {
         type: Date,
         default: Date.now,
     },
+
     resetPasswordToken: String,
     resetPasswordExpire: Date,
 });
 
 // other pre-save, methods, and exports stay the same...
-
-
 
 userSchema.pre("save", async function (next) {
     if (!this.isModified("password")) {

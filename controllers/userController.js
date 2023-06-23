@@ -8,22 +8,39 @@ const cloudinary = require("cloudinary");
 const { sendOtp, verifyOtp } = require("../utils/msegatService");
 // Register User
 exports.registerUser = asyncErrorHandler(async (req, res, next) => {
-    const { firstName, lastName, email, password, phone } = req.body;
+    const { firstName, lastName, email, password, phone, passportNumber, birthday, status, saudiId, nationality } = req.body;
 
-    const user = await User.create({
+    const userData = {
         firstName,
         lastName,
         email,
         password,
         phone,
-    });
+        birthday,
+        status,
+    };
+
+    if (status === "citizen" || status === "resident") {
+        userData.nationalId = saudiId;
+    } else {
+        userData.passport = {
+            country: nationality,
+            id: passportNumber,
+        };
+    }
+
+    const user = await User.create(userData);
 
     // Create email confirmation token
     const confirmationToken = user.getConfirmationToken();
+    user.emailVerified = false;
+    user.emailVerificationToken = confirmationToken;
+    user.emailVerificationExpires = Date.now() + 15 * 60 * 1000; // 15 minutes
+
     await user.save({ validateBeforeSave: false });
 
     // Create confirmation URL
-    const confirmUrl = `${req.protocol}://travelcotest.netlify.app/confirm_email/${confirmationToken}`;
+    const confirmUrl = `${req.protocol}://${req.get("host")}/confirm_email/${confirmationToken}`;
 
     try {
         await sendEmail.sendEmailConfirm({

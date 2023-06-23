@@ -30,7 +30,7 @@ const bookingSchema = new mongoose.Schema(
             type: Date,
             required: true,
         },
-        delivery: {
+        isDelivery: {
             type: Boolean,
             default: false,
         },
@@ -44,10 +44,40 @@ const bookingSchema = new mongoose.Schema(
             type: Number,
             required: true,
         },
+        currency: {
+            type: String,
+            default: 'SAR'
+        },
+        rate: {
+            type: String,
+            enum: ['perHour', "perDay", "perMonth"],
+            default: "perDay",
+        },
+        hours: {
+            type: Number,
+            default: false,
+        },
+        days: {
+            type: Number,
+            default: false,
+        },
+        months: {
+            type: Number,
+            default: false,
+        },
+        isExtended: {
+            type: Boolean,
+            default: false,
+        },
+        extendedDate: {
+            type: Boolean,
+            default: false,
+        },
         isContract: {
             type: Boolean,
             default: false,
         },
+
 
         rideStatus: {
             type: String,

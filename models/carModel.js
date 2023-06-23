@@ -26,7 +26,10 @@ const carSchema = new mongoose.Schema({
     engine: { type: String, required: true },
     maxPeople: { type: Number, required: true },
     numDoors: { type: Number, required: true },
+    airCondition: { type: Boolean, required: true },
     bags: { type: Number, required: true },
+    seats: { type: Number, required: true },
+    doors: { type: Number, required: true },
     favoritedBy: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Car' }],
     pricePerDay: { type: Number, required: true },
     pricePerHour: { type: Number, required: true },
@@ -34,7 +37,11 @@ const carSchema = new mongoose.Schema({
     availability: { type: Boolean, default: true },
     discount: { type: Number, default: 0 },
     year: { type: Number, required: true },
-    reviews: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Review' }]
+    model: { type: String, required: true },
+
+    reviews: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Review' }],
+    branch: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Branch' }]
+
 });
 
 const Car = mongoose.model("Car", carSchema);

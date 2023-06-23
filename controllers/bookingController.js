@@ -4,19 +4,33 @@ const { Car } = require("../models/carModel");
 // Create a booking
 exports.createBooking = async (req, res) => {
     try {
-        const booking = new Booking(req.body);
+        const { car: carId, user, address, pickupLocation, returnLocation, startDate, endDate, totalPrice, currency } = req.body;
+
+        const booking = new Booking({
+            car: carId,
+            user,
+            address,
+            pickupLocation,
+            returnLocation,
+            startDate,
+            endDate,
+            totalPrice,
+            currency,
+        });
+
         await booking.save();
 
         // Set availability of the car to false upon booking
-        const car = await Car.findById(req.body.car);
-        car.availability = false;
-        await car.save();
+        const carToUpdate = await Car.findById(carId);
+        carToUpdate.availability = false;
+        await carToUpdate.save();
 
         res.status(201).send(booking);
     } catch (error) {
         res.status(400).send(error);
     }
 };
+
 
 // Get all bookings of a user
 exports.getAllBookings = async (req, res) => {
@@ -153,9 +167,11 @@ exports.cancelBooking = async (req, res) => {
         if (!booking) {
             return res.status(404).send({ message: "Booking not found" });
         }
+        const car = await Car.findById(booking.car);
         booking.rideStatus = "cancelled"
-        booking.availability = true
+        car.availability = true;
         await booking.save()
+        await car.save()
         res.send(booking);
     } catch (error) {
         res.status(500).send(error);
@@ -167,9 +183,12 @@ exports.completeBooking = async (req, res) => {
         if (!booking) {
             return res.status(404).send({ message: "Booking not found" });
         }
+        const car = await Car.findById(booking.car);
+
         booking.rideStatus = "completed"
-        booking.availability = true
+        car.availability = true;
         await booking.save()
+        await car.save()
         res.send(booking);
     } catch (error) {
         res.status(500).send(error);
