@@ -18,7 +18,6 @@ const {
     sendEmailConfirmation,
 } = require("../controllers/userController");
 const { isAuthenticatedUser, authorizeRoles } = require("../middlewares/auth");
-const { isVendor } = require("../middlewares/isVendor");
 
 
 const router = express.Router();
@@ -26,19 +25,19 @@ const router = express.Router();
 router.route("/register").post(registerUser);
 router.route("/login").post(loginUser);
 router.route("/logout").get(logoutUser);
-
 router.route("/confirm_email/:token").get(confirmEmail);
 router.post('/send_confirmation_email', sendEmailConfirmation);
 router.route("/me").post(getUserDetails);
-
-
-
 router.route("/password/update").put(updatePassword);
 router.post('/sendOtp', sendPhoneVerification);
-
 // Verify OTP code
 router.post('/verifyPhone', verifyPhone);
 router.route("/me/update").put(updateProfile);
+
+
+
+
+
 router.route("/password/forgot").post(forgotPassword);
 router.route("/password/reset/:token").put(resetPassword);
 router

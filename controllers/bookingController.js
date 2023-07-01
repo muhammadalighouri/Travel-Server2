@@ -4,7 +4,7 @@ const { Car } = require("../models/carModel");
 // Create a booking
 exports.createBooking = async (req, res) => {
     try {
-        const { car: carId, user, address, pickupLocation, returnLocation, startDate, endDate, totalPrice, currency } = req.body;
+        const { carId, user, address, pickupLocation, returnLocation, startDate, endDate, totalPrice, currency } = req.body;
 
         const booking = new Booking({
             car: carId,

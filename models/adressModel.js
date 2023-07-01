@@ -2,12 +2,13 @@
 const mongoose = require('mongoose');
 
 const addressSchema = new mongoose.Schema({
-    street: String,
+    address: String,
     city: String,
-    state: String,
-    zip: String,
     title: String,
-    latLong: String,
+    state: String,
+    lat: Number,
+    lng: Number,
+    postalCode: Number,
     user: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",

@@ -4,7 +4,7 @@ const User = require("../models/userModel");
 
 exports.createAddress = async (req, res) => {
     try {
-        const { street, city, state, zip, user, title, latLong } = req.body;
+        const { address, city, state, user, title, lat, lng, postalCode } = req.body;
 
         // Check if the user exists
         const userExist = await User.findById(user);
@@ -21,8 +21,8 @@ exports.createAddress = async (req, res) => {
             });
         }
 
-        const address = new Address({ street, city, state, zip, user: userExist._id, title });
-        const savedAddress = await address.save();
+        const addressData = new Address({ address, city, state, user: userExist._id, title, lat, lng, postalCode });
+        const savedAddress = await addressData.save();
 
         // Add the address to the user's address array
         userExist.addresses.push(savedAddress._id);
@@ -62,10 +62,10 @@ exports.getAddressById = async (req, res) => {
 // Update an address
 exports.updateAddress = async (req, res) => {
     try {
-        const { street, city, state, zip, title } = req.body;
+        const { address, city, state, title, lat, lng, postalCode } = req.body;
         const updatedAddress = await Address.findByIdAndUpdate(
             req.params.id,
-            { title, street, city, state, zip },
+            { address, city, state, title, lat, lng, postalCode },
             { new: true }
         );
         if (!updatedAddress) {

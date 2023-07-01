@@ -1,40 +1,40 @@
-const cartModels = require("../models/carModel");
+const Car = require("../models/carModel");
 const User = require("../models/userModel");
 const cloudinary = require('cloudinary');
 const filterInfo = async (req, res) => {
     try {
         // Categories with counts
-        const categoryCounts = await cartModels.Car.aggregate([
+        const categoryCounts = await Car.aggregate([
             { $group: { _id: "$category", count: { $sum: 1 } } },
         ]);
 
         // Brands with counts
-        const brandCounts = await cartModels.Car.aggregate([
+        const brandCounts = await Car.aggregate([
             { $group: { _id: "$brand", count: { $sum: 1 } } },
         ]);
 
         // Models (types) with counts
-        const modelCounts = await cartModels.Car.aggregate([
+        const modelCounts = await Car.aggregate([
             { $group: { _id: "$type", count: { $sum: 1 } } },
         ]);
 
         // Price range
-        const minPrice = await cartModels.Car.find()
+        const minPrice = await Car.find()
             .sort({ pricePerDay: 1 })
             .limit(1)
             .select("pricePerDay");
-        const maxPrice = await cartModels.Car.find()
+        const maxPrice = await Car.find()
             .sort({ pricePerDay: -1 })
             .limit(1)
             .select("pricePerDay");
 
         // Number of available cars
-        const availableCarsCount = await cartModels.Car.countDocuments({
+        const availableCarsCount = await Car.countDocuments({
             availability: true,
         });
 
         // Number of unavailable cars
-        const unavailableCarsCount = await cartModels.Car.countDocuments({
+        const unavailableCarsCount = await Car.countDocuments({
             availability: false,
         });
 
@@ -79,7 +79,7 @@ const createReview = async (req, res) => {
     const { userId, rating, comment } = req.body; // assuming you're getting userId from the client
 
     // Find the car
-    const car = await cartModels.cartModels.Car.findById(carId);
+    const car = await cartModels.Car.findById(carId);
     if (!car) {
         return res.status(404).json({ message: "Car not found" });
     }
@@ -181,7 +181,7 @@ const getAllCars = async (req, res) => {
                 filter._id = { $in: user.favorites.map((favorite) => favorite._id) };
             }
 
-            const cars = await cartModels.Car.find(filter)
+            const cars = await Car.find(filter)
                 .skip((page - 1) * limit)
                 .limit(limit)
                 .lean(); // Use lean() to get plain JS objects instead of Mongoose documents.
@@ -193,16 +193,16 @@ const getAllCars = async (req, res) => {
                 );
             });
 
-            const total = await cartModels.Car.countDocuments(filter); // Total count of filtered cars
+            const total = await Car.countDocuments(filter); // Total count of filtered cars
 
             // Return cars along with pagination info
             res.json({ total, page, limit, cars });
         } else {
-            const cars = await cartModels.Car.find(filter)
+            const cars = await Car.find(filter)
                 .skip((page - 1) * limit)
                 .limit(limit);
 
-            const total = await cartModels.Car.countDocuments(filter); // Total count of filtered cars
+            const total = await Car.countDocuments(filter); // Total count of filtered cars
 
             // Return cars along with pagination info
             res.json({ total, page, limit, cars });
@@ -245,7 +245,7 @@ const createCar = async (req, res) => {
             public_id: myCloud.public_id,
             url: myCloud.secure_url,
         };
-        const car = await cartModels.Car.create(newCarData);
+        const car = await Car.create(newCarData);
         res.status(201).json(car);
     } catch (error) {
         console.log(error);
@@ -256,7 +256,7 @@ const createCar = async (req, res) => {
 // Get a specific car by ID
 const getCarById = async (req, res) => {
     try {
-        const car = await cartModels.Car.findById(req.params.carId);
+        const car = await Car.findById(req.params.carId);
         if (car) {
             res.json(car);
         } else {
@@ -286,7 +286,7 @@ const updateCar = async (req, res) => {
             year: req.body.year,
         };
 
-        const car = await cartModels.Car.findById(req.params.carId);
+        const car = await Car.findById(req.params.carId);
 
         if (!car) {
             return res.status(404).json({ error: "Car not found" });
@@ -306,7 +306,7 @@ const updateCar = async (req, res) => {
             };
         }
 
-        const updatedCar = await cartModels.Car.findByIdAndUpdate(
+        const updatedCar = await Car.findByIdAndUpdate(
             req.params.carId,
             updatedCarData,
             { new: true }
@@ -323,7 +323,7 @@ const updateCar = async (req, res) => {
 // Delete a car
 const deleteCar = async (req, res) => {
     try {
-        const car = await cartModels.Car.findByIdAndDelete(req.params.carId);
+        const car = await Car.findByIdAndDelete(req.params.carId);
         if (car) {
             res.json({ status: "success", message: "Car deleted successfully" });
         } else {
@@ -339,7 +339,7 @@ const deleteCar = async (req, res) => {
 // Get available cars
 const getAvailableCars = async (req, res) => {
     try {
-        const cars = await cartModels.Car.find({ availability: true });
+        const cars = await Car.find({ availability: true });
         res.json(cars);
     } catch (error) {
         res.status(500).json({ error: "Failed to retrieve available cars" });
@@ -349,7 +349,7 @@ const getAvailableCars = async (req, res) => {
 // Update car availability
 const updateCarAvailability = async (req, res) => {
     try {
-        const car = await cartModels.Car.findByIdAndUpdate(
+        const car = await Car.findByIdAndUpdate(
             req.params.carId,
             { availability: req.body.availability },
             { new: true }
@@ -369,7 +369,7 @@ const getAllReview = async (req, res) => {
     const { carId } = req.params;
 
     // Find the car
-    const car = await cartModels.Car.findById(carId).populate("reviews").exec();
+    const car = await Car.findById(carId).populate("reviews").exec();
     if (!car) {
         return res.status(404).json({ message: "Car not found" });
     }
@@ -427,11 +427,11 @@ const getAllCarsAdmin = async (req, res) => {
         if (req.query.carYear) {
             filter.year = parseInt(req.query.carYear);
         }
-        const cars = await cartModels.Car.find(filter)
+        const cars = await Car.find(filter)
             .skip((page - 1) * limit)
             .limit(limit);
 
-        const total = await cartModels.Car.countDocuments(filter); // Total count of filtered cars
+        const total = await Car.countDocuments(filter); // Total count of filtered cars
 
         // Return cars along with pagination info
         res.json({ total, page, limit, cars });
