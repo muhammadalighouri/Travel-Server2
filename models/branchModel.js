@@ -3,31 +3,35 @@ const mongoose = require("mongoose");
 const branchSchema = new mongoose.Schema({
     name: {
         type: String,
-        required: [true, "Please enter the branch name"],
     },
     address: {
         type: String,
-        required: [true, "Please enter the branch address"],
     },
-    location: {
-        type: {
-            type: String,
-            enum: ["Point"],
-            required: true,
-        },
-        coordinates: {
-            type: [Number],
-            required: true,
-        },
+    city: {
+        type: String,
     },
+
+    branchNumber: {
+        type: String,
+    },
+    branchMobile: {
+        type: String,
+    },
+    lat: {
+        type: Number,
+    },
+    lng: {
+        type: Number,
+    },
+
     timings: {
         weekdays: {
             type: String,
-            required: [true, "Please enter the timings for weekdays (Mon to Thu)"],
+            // required: [true, "Please enter the timings for weekdays (Mon to Thu)"],
         },
         weekends: {
             type: String,
-            required: [true, "Please enter the timings for weekends (Fri to Sun)"],
+            // required: [true, "Please enter the timings for weekends (Fri to Sun)"],
         },
     },
     cars: [

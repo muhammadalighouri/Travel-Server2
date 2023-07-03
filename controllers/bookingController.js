@@ -1,5 +1,5 @@
 const Booking = require("../models/bookingModel");
-const { Car } = require("../models/carModel");
+const Car = require("../models/carModel");
 
 // Create a booking
 exports.createBooking = async (req, res) => {
@@ -19,13 +19,13 @@ exports.createBooking = async (req, res) => {
         });
 
         await booking.save();
-
         // Set availability of the car to false upon booking
         const carToUpdate = await Car.findById(carId);
         carToUpdate.availability = false;
         await carToUpdate.save();
+        // Set availability of the car to false upon booking
 
-        res.status(201).send(booking);
+        res.status(201).send(carToUpdate);
     } catch (error) {
         res.status(400).send(error);
     }

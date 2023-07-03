@@ -18,8 +18,7 @@ const carSchema = new mongoose.Schema({
     },
     brand: { type: String, required: true },
     engine: { type: String, required: true },
-    maxPeople: { type: Number, required: true },
-    numDoors: { type: Number, required: true },
+
     airCondition: { type: Boolean, required: true },
     bags: { type: Number, required: true },
     seats: { type: Number, required: true },

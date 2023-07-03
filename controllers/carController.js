@@ -226,15 +226,20 @@ const createCar = async (req, res) => {
             type: req.body.type,
             brand: req.body.brand,
             engine: req.body.engine,
-            maxPeople: req.body.maxPeople,
-            numDoors: req.body.numDoors,
+            airCondition: req.body.airCondition,
             bags: req.body.bags,
+            seats: req.body.seats,
+            doors: req.body.doors,
             pricePerDay: req.body.pricePerDay,
             pricePerHour: req.body.pricePerHour,
             pricePerMonth: req.body.pricePerMonth,
-            discount: req.body.discount,
+            availability: req.body.availability || true,
+            discount: req.body.discount || 0,
             year: req.body.year,
+            model: req.body.model,
+            branch: req.body.branch,
         };
+
 
         const myCloud = await cloudinary.v2.uploader.upload(req.body.image, {
             folder: "cars",
