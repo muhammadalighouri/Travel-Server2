@@ -1,6 +1,7 @@
 const Car = require("../models/carModel");
 const User = require("../models/userModel");
 const cloudinary = require('cloudinary');
+const convertCurrency = require('../utils/currencyConverter');
 const filterInfo = async (req, res) => {
     try {
         // Categories with counts
@@ -118,6 +119,9 @@ const createReview = async (req, res) => {
 };
 
 // Get all cars
+// Get all cars
+
+// Get all cars
 const getAllCars = async (req, res) => {
     try {
         const filter = { availability: true };
@@ -141,6 +145,7 @@ const getAllCars = async (req, res) => {
         if (req.query.numDoors) {
             filter.numDoors = parseInt(req.query.numDoors);
         }
+
         if (req.query.category) {
             const categories = req.query.category.split(",");
             filter.category = { $in: categories };
@@ -167,10 +172,13 @@ const getAllCars = async (req, res) => {
         if (req.query.carYear) {
             filter.year = parseInt(req.query.carYear);
         }
+
         const userId = req.body.user;
+
         if (userId) {
             // Fetch the user with populated favorites
             const user = await User.findById(userId).populate("favorites");
+
             // Check if user exists
             if (!user) {
                 return res.status(404).json({ error: "User not found" });
@@ -181,10 +189,35 @@ const getAllCars = async (req, res) => {
                 filter._id = { $in: user.favorites.map((favorite) => favorite._id) };
             }
 
-            const cars = await Car.find(filter)
+            let cars = await Car.find(filter)
                 .skip((page - 1) * limit)
                 .limit(limit)
                 .lean(); // Use lean() to get plain JS objects instead of Mongoose documents.
+
+            // Convert prices to the target currency if provided in the request
+            const targetCurrency = req.query.currency || "SAR"; // Default currency is SAR (Saudi Riyal)
+
+            if (targetCurrency !== "SAR") {
+                // Fetch the base currency conversion rate from the API
+                const baseCurrency = "SAR"; // Base currency is always SAR
+                const convertedPrices = [];
+
+                // Convert each car's price to the target currency
+                for (const car of cars) {
+                    const convertedPrice = await convertCurrency(
+                        car.pricePerDay,
+                        baseCurrency,
+                        targetCurrency
+                    );
+
+                    convertedPrices.push(convertedPrice);
+                }
+
+                // Update each car's price with the converted value
+                for (let i = 0; i < cars.length; i++) {
+                    cars[i].pricePerDay = convertedPrices[i];
+                }
+            }
 
             // Add isFavorited field to each car
             cars.forEach((car) => {
@@ -198,9 +231,33 @@ const getAllCars = async (req, res) => {
             // Return cars along with pagination info
             res.json({ total, page, limit, cars });
         } else {
-            const cars = await Car.find(filter)
+            let cars = await Car.find(filter)
                 .skip((page - 1) * limit)
                 .limit(limit);
+
+            const targetCurrency = req.query.currency || "SAR"; // Default currency is SAR (Saudi Riyal)
+
+            if (targetCurrency !== "SAR") {
+                // Fetch the base currency conversion rate from the API
+                const baseCurrency = "SAR"; // Base currency is always SAR
+                const convertedPrices = [];
+
+                // Convert each car's price to the target currency
+                for (const car of cars) {
+                    const convertedPrice = await convertCurrency(
+                        car.pricePerDay,
+                        baseCurrency,
+                        targetCurrency
+                    );
+
+                    convertedPrices.push(convertedPrice);
+                }
+
+                // Update each car's price with the converted value
+                for (let i = 0; i < cars.length; i++) {
+                    cars[i].pricePerDay = convertedPrices[i];
+                }
+            }
 
             const total = await Car.countDocuments(filter); // Total count of filtered cars
 
@@ -212,6 +269,7 @@ const getAllCars = async (req, res) => {
         res.status(500).json({ error: error.message }); // Send the actual error message as the response.
     }
 };
+
 
 // Admin controller
 

@@ -32,6 +32,7 @@ const sponsor = require("./routes/sponserRoute");
 const contact = require("./routes/contactRoute");
 const branch = require("./routes/branchesRoutes");
 const gallery = require("./routes/galleryRoutes");
+const payment = require("./routes/paymentRoute");
 
 app.use("/api/v1/user", user);
 app.use("/api/v1/cars", car);
@@ -43,6 +44,7 @@ app.use("/api/v1/slides", slide);
 app.use("/api/v1/sponsor", sponsor);
 app.use("/api/v1/branches", branch);
 app.use("/api/v1/media/gallery", gallery);
+app.use("/api/v1/payment", payment);
 app.use("/api/v1", category);
 
 // deployment
