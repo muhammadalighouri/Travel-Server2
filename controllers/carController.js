@@ -229,7 +229,7 @@ const getAllCars = async (req, res) => {
             const total = await Car.countDocuments(filter); // Total count of filtered cars
 
             // Return cars along with pagination info
-            res.json({ total, page, limit, cars });
+            res.json({ total, page, limit, cars, currency: targetCurrency });
         } else {
             let cars = await Car.find(filter)
                 .skip((page - 1) * limit)
@@ -262,7 +262,7 @@ const getAllCars = async (req, res) => {
             const total = await Car.countDocuments(filter); // Total count of filtered cars
 
             // Return cars along with pagination info
-            res.json({ total, page, limit, cars });
+            res.json({ total, page, limit, cars, currency: targetCurrency });
         }
     } catch (error) {
         console.log(error); // log the error to your server console.

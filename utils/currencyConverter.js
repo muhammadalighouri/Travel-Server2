@@ -1,7 +1,7 @@
 const axios = require("axios")
 
 const convertCurrency = async (amount, baseCurrency, targetCurrency) => {
-    const apiKey = 'b3922bbd5b844e49907007e308edab9a'; // Replace with your API key
+    const apiKey = '9eaf47a5e95a4ca9b249e32de7a11f1a'; // Replace with your API key
     const apiUrl = `https://openexchangerates.org/api/latest.json?app_id=${apiKey}`;
 
     try {
