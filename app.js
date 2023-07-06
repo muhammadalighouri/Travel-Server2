@@ -47,8 +47,8 @@ app.use("/api/v1/sponsor", sponsor);
 app.use("/api/v1/branches", branch);
 app.use("/api/v1/media/gallery", gallery);
 app.use("/api/v1/payment", payment);
-app.use("/api/v1/faqs", faqs);
-app.use("/api/v1/blogs", blogs);
+app.use("/api/v1/media/faqs", faqs);
+app.use("/api/v1/media/blogs", blogs);
 app.use("/api/v1", category);
 
 // deployment
