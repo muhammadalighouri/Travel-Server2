@@ -13,6 +13,7 @@
   "author": "Jigar Sable",
   "license": "ISC",
   "dependencies": {
+    "@geoapify/geocoder-autocomplete": "^1.5.1",
     "@sendgrid/mail": "^7.6.0",
     "axios": "^1.4.0",
     "bcryptjs": "^2.4.3",
@@ -27,6 +28,7 @@
     "express-fileupload": "^1.2.1",
     "jsonwebtoken": "^8.5.1",
     "mailgen": "^2.0.27",
+    "mapbox-gl": "^2.15.0",
     "mongoose": "^6.1.7",
     "node-cron": "^3.0.2",
     "nodemailer": "^6.9.2",
