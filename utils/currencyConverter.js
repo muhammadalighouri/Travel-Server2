@@ -1,4 +1,4 @@
-const axios = require("axios")
+const axios = require("axios");
 
 const convertCurrency = async (amount, baseCurrency, targetCurrency) => {
     const apiKey = '9eaf47a5e95a4ca9b249e32de7a11f1a'; // Replace with your API key
@@ -9,7 +9,10 @@ const convertCurrency = async (amount, baseCurrency, targetCurrency) => {
         const exchangeRates = response.data.rates;
 
         // Convert the amount from the base currency to the target currency
-        const convertedAmount = (amount / exchangeRates[baseCurrency]) * exchangeRates[targetCurrency];
+        let convertedAmount = (amount / exchangeRates[baseCurrency]) * exchangeRates[targetCurrency];
+
+        // Round the converted amount to one decimal place
+        convertedAmount = Math.round(convertedAmount * 10) / 10;
 
         return convertedAmount;
     } catch (error) {
