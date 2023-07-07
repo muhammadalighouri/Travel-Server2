@@ -14,30 +14,28 @@ exports.getAllBlogs = async (req, res) => {
 // Create a new blog
 exports.createBlog = async (req, res) => {
     try {
-        let image = null;
-        if (req.body.image) {
-            const myCloud = await cloudinary.v2.uploader.upload(req.body.image, {
-                folder: "blogImages",
-                width: 150,
-                crop: "scale",
-            });
-            image = {
-                public_id: myCloud.public_id,
-                url: myCloud.secure_url,
-            };
-        }
-
-        const blog = new Blog({
-            title: req.body.title,
-            content: req.body.content,
-            image: image,
+        const { title, content, image } = req.body;
+        const imageUploadResult = await cloudinary.v2.uploader.upload(image, {
+            folder: "blogs",
+            width: 550,
+            crop: "scale",
         });
 
-        await blog.save();
+        const blogData = {
+            title: title,
+            content: content,
+            image: {
+                public_id: imageUploadResult.public_id,
+                url: imageUploadResult.secure_url,
+            },
+        };
+
+        const blog = await Blog.create(blogData);
 
         res.status(201).json(blog);
     } catch (err) {
-        res.status(400).json({ error: "Bad Request" });
+        console.log(err);
+        res.status(400).json({ error: "Bad bRequest" });
     }
 };
 
