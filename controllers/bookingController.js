@@ -61,6 +61,7 @@ exports.getAllBookings = async (req, res) => {
 // Get a single booking
 exports.getBooking = async (req, res) => {
     try {
+
         const booking = await Booking.findById(req.params.id)
             .populate("car")
             .populate("user");
@@ -126,7 +127,7 @@ exports.deleteBooking = async (req, res) => {
 // Get all bookings for admin
 exports.getAllBookingsByAdmin = async (req, res) => {
     try {
-        const bookings = await Booking.find({}).populate("car").populate("user");
+        const bookings = await Booking.find({ rideStatus: req.body.status }).populate("car").populate("user");
 
         res.send(bookings);
     } catch (error) {
