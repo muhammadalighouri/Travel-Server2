@@ -15,8 +15,8 @@ exports.getAllBlogs = async (req, res) => {
 exports.createBlog = async (req, res) => {
     try {
         let image = null;
-        if (req.file) {
-            const myCloud = await cloudinary.v2.uploader.upload(req.file.path, {
+        if (req.body.image) {
+            const myCloud = await cloudinary.v2.uploader.upload(req.body.image, {
                 folder: "blogImages",
                 width: 150,
                 crop: "scale",
