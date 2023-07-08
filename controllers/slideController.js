@@ -18,7 +18,7 @@ exports.createSlide = async (req, res) => {
 
         const imageUploadResult = await cloudinary.v2.uploader.upload(image, {
             folder: "slides",
-            width: 150,
+            width: 550,
             crop: "scale",
         });
 
