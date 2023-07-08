@@ -301,7 +301,7 @@ const createCar = async (req, res) => {
 
         const myCloud = await cloudinary.v2.uploader.upload(req.body.image, {
             folder: "cars",
-            width: 150,
+            width: 300,
             crop: "scale",
         });
         newCarData.image = {
