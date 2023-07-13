@@ -35,7 +35,10 @@ const gallery = require("./routes/galleryRoutes");
 const payment = require("./routes/paymentRoute");
 const faqs = require("./routes/faqRoutes");
 const blogs = require("./routes/blogRoutes");
-
+//hello world
+app.get("/", (req, res) => {
+    res.send("Server is Live 🔥");
+});
 app.use("/api/v1/user", user);
 app.use("/api/v1/cars", car);
 app.use("/api/v1/favorites", favorites);

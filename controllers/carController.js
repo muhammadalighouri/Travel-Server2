@@ -202,20 +202,38 @@ const getAllCars = async (req, res) => {
                 const baseCurrency = "SAR"; // Base currency is always SAR
                 const convertedPrices = [];
 
-                // Convert each car's price to the target currency
+                // Convert each car's pricePerDay, pricePerHour, and pricePerMonth to the target currency
                 for (const car of cars) {
-                    const convertedPrice = await convertCurrency(
+                    const convertedPricePerDay = await convertCurrency(
                         car.pricePerDay,
                         baseCurrency,
                         targetCurrency
                     );
 
-                    convertedPrices.push(convertedPrice);
+                    const convertedPricePerHour = await convertCurrency(
+                        car.pricePerHour,
+                        baseCurrency,
+                        targetCurrency
+                    );
+
+                    const convertedPricePerMonth = await convertCurrency(
+                        car.pricePerMonth,
+                        baseCurrency,
+                        targetCurrency
+                    );
+
+                    car.pricePerDay = convertedPricePerDay;
+                    car.pricePerHour = convertedPricePerHour;
+                    car.pricePerMonth = convertedPricePerMonth;
+
+                    convertedPrices.push(convertedPricePerDay, convertedPricePerHour, convertedPricePerMonth);
                 }
 
-                // Update each car's price with the converted value
+                // Update each car's prices with the converted values
                 for (let i = 0; i < cars.length; i++) {
-                    cars[i].pricePerDay = convertedPrices[i];
+                    cars[i].pricePerDay = convertedPrices[i * 3];
+                    cars[i].pricePerHour = convertedPrices[i * 3 + 1];
+                    cars[i].pricePerMonth = convertedPrices[i * 3 + 2];
                 }
             }
 
@@ -242,22 +260,41 @@ const getAllCars = async (req, res) => {
                 const baseCurrency = "SAR"; // Base currency is always SAR
                 const convertedPrices = [];
 
-                // Convert each car's price to the target currency
+                // Convert each car's pricePerDay, pricePerHour, and pricePerMonth to the target currency
                 for (const car of cars) {
-                    const convertedPrice = await convertCurrency(
+                    const convertedPricePerDay = await convertCurrency(
                         car.pricePerDay,
                         baseCurrency,
                         targetCurrency
                     );
 
-                    convertedPrices.push(convertedPrice);
+                    const convertedPricePerHour = await convertCurrency(
+                        car.pricePerHour,
+                        baseCurrency,
+                        targetCurrency
+                    );
+
+                    const convertedPricePerMonth = await convertCurrency(
+                        car.pricePerMonth,
+                        baseCurrency,
+                        targetCurrency
+                    );
+
+                    car.pricePerDay = convertedPricePerDay;
+                    car.pricePerHour = convertedPricePerHour;
+                    car.pricePerMonth = convertedPricePerMonth;
+
+                    convertedPrices.push(convertedPricePerDay, convertedPricePerHour, convertedPricePerMonth);
                 }
 
-                // Update each car's price with the converted value
+                // Update each car's prices with the converted values
                 for (let i = 0; i < cars.length; i++) {
-                    cars[i].pricePerDay = convertedPrices[i];
+                    cars[i].pricePerDay = convertedPrices[i * 3];
+                    cars[i].pricePerHour = convertedPrices[i * 3 + 1];
+                    cars[i].pricePerMonth = convertedPrices[i * 3 + 2];
                 }
             }
+
 
             const total = await Car.countDocuments(filter); // Total count of filtered cars
 
